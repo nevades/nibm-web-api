@@ -3,17 +3,38 @@ const controller = require("./controller");
 
 const router = new Router();
 
+router.post("/auth", controller.auth);
+
 router.post(
-  "/district/",
+  "/district/add",
   [controller.auther, controller.admin],
   controller.addDistrict
 );
+
 router.post(
-  "/data/",
+  "/district/delete",
+  [controller.auther, controller.admin],
+  controller.deleteDistrict
+);
+
+router.post(
+  "/user/add",
+  [controller.auther, controller.admin],
+  controller.addUser
+);
+
+router.post(
+  "/user/delete",
+  [controller.auther, controller.admin],
+  controller.deleteUser
+);
+
+router.post(
+  "/data/add",
   [controller.auther, controller.editor],
   controller.addData
 );
+
 router.get("/", [controller.auther, controller.viewer], controller.getData);
-router.post("/auth", controller.auth);
 
 module.exports = router;

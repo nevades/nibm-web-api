@@ -1,6 +1,6 @@
 const axios = require("axios");
 
-const API_ENDPOINT = "http://localhost:3000/api/weather/data";
+const API_ENDPOINT = "http://localhost:3000/api/weather/data/add";
 
 function generateData(c) {
   const temperature = (Math.random() * (40 - 20) + 20).toFixed(2);
@@ -18,17 +18,19 @@ function generateData(c) {
 async function sendData() {
   try {
     var c = 1;
+    var token =
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJlZGl0b3IiXSwiaWF0IjoxNzExNTQ0OTcwLCJleHAiOjE3MTE1NDg1NzB9.EWKDbB__r4EjZWEaM5UfNQ2HCusiJniXInosOWKhcsw";
+
     do {
       const data = generateData(c);
       const response = await axios.post(API_ENDPOINT, data, {
         headers: {
-          "x-auth-token":
-            "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJhZG1pbiIsImVkaXRvciIsInZpZXdlciJdLCJpYXQiOjE3MTEwMjAwNzYsImV4cCI6MTcxMTAyMDk3Nn0.FJ2NTTyLHa7eXkOhCrkM-gRaRurmUCXkjDTPiUBatmg",
+          "x-auth-token": token,
         },
       });
       console.log("Data sent successfully:", data);
       c++;
-    } while (c <= 25); // Fixed the loop condition
+    } while (c <= 25);
   } catch (error) {
     console.error("Failed to send data:", error.message);
   }

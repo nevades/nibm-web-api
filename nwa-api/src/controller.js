@@ -54,41 +54,77 @@ function viewer(req, res, next) {
   next();
 }
 
-const auth = async (req, res) => {
-  // Dummy data
-  const users = [
-    {
-      email: "nevanjith@gmail.com",
-      password: "$2b$15$AJmvWy/DJ.p417F9/X7D7uUTgGVCEkVF63Hh2Ct7K0yE9Zt1JleAW",
-      roles: ["admin", "editor", "viewer"],
-    },
-  ];
+const auth = (req, res) => {
+  const { email, password } = req.body;
+  pool.query(queries.checkUserExists, [email], (error, results) => {
+    if (results.rows.length) {
+      const userFromDB = results.rows[0];
+      const user = {
+        email: userFromDB.email,
+        password: userFromDB.password,
+        roles: userFromDB.roles,
+      };
 
-  // Get to user from the database, if the user is not there return error
-  let user = users.find((u) => u.email === req.body.email);
-  if (!user) throw new Error("Invalid email or password.");
-
-  // Compare the password with the password in the database
-  const valid = await bcrypt.compare(req.body.password, user.password);
-  if (!valid) throw new Error("Invalid email or password.");
-
-  const token = jwt.sign(
-    {
-      id: user._id,
-      roles: user.roles,
-    },
-    "jwtPrivateKey",
-    { expiresIn: "15m" }
-  );
-
-  res.send({
-    ok: true,
-    token: token,
+      bcrypt.compare(password, user.password, (err, valid) => {
+        if (valid) {
+          const token = jwt.sign(
+            {
+              id: userFromDB._id,
+              roles: user.roles,
+            },
+            "jwtPrivateKey",
+            { expiresIn: "60m" }
+          );
+          res.send({
+            ok: true,
+            token: token,
+          });
+        } else {
+          res.status(401).send("Invalid email or password.");
+        }
+      });
+    } else {
+      res.status(401).send("Invalid email or password.");
+    }
   });
 };
 
+// const auth = async (req, res) => {
+//   const users = [
+//     {
+//       email: "nevanjith@gmail.com",
+//       password: "$2b$15$JjVln1Ut8NrfM7RiSquaIu25MmEd2jtuMWWN6Fy4Y7zFjeJhEOkXS",
+//       roles: ["admin", "editor", "viewer"],
+//     },
+//   ];
+//   // Get to user from the database, if the user is not there return error
+//   let user = users.find((u) => u.email === req.body.email);
+//   // if (!user) throw new Error("Invalid email or password.");
+//   if (!user) res.send("Invalid email or password.");
+//   // Compare the password with the password in the database
+//   const valid = await bcrypt.compare(req.body.password, user.password);
+//   // if (!valid) throw new Error("Invalid email or password.");
+//   if (!valid) res.send("Invalid email or password.");
+//   const token = jwt.sign(
+//     {
+//       id: user._id,
+//       roles: user.roles,
+//     },
+//     "jwtPrivateKey",
+//     { expiresIn: "60m" }
+//   );
+//   res.send({
+//     ok: true,
+//     token: token,
+//   });
+// };
+
 const addDistrict = (req, res) => {
   const { district_name } = req.body;
+
+  if (!district_name || district_name.trim() === "") {
+    return res.status(400).send("District name is required.");
+  }
 
   pool.query(queries.checkDistrictExists, [district_name], (error, results) => {
     if (results.rows.length) {
@@ -98,6 +134,68 @@ const addDistrict = (req, res) => {
         if (error) throw error;
         res.status(201).send("District Created Sucessfully");
       });
+    }
+  });
+};
+
+const deleteDistrict = (req, res) => {
+  const { district_name } = req.body;
+
+  if (!district_name || district_name.trim() === "") {
+    return res.status(400).send("District name is required.");
+  }
+
+  pool.query(queries.checkDistrictExists, [district_name], (error, results) => {
+    if (results.rows.length) {
+      pool.query(queries.deleteDistrict, [district_name], (error, results) => {
+        if (error) throw error;
+        res.status(201).send("District Deleted Sucessfully");
+      });
+    } else {
+      res.send("District dosen't exists.");
+    }
+  });
+};
+
+const addUser = async (req, res) => {
+  const { email, password, roles } = req.body;
+  if (!email || !password || !roles || !email.trim() || !password.trim()) {
+    return res.status(400).send("Email, password, and role are required.");
+  }
+
+  try {
+    const pwd_hash = await bcrypt.hash(password, 15);
+    pool.query(queries.checkUserExists, [email], (error, results) => {
+      if (results.rows.length) {
+        res.send("User already exists.");
+      } else {
+        pool.query(
+          queries.addUser,
+          [email, pwd_hash, JSON.stringify(roles)],
+          (error, results) => {
+            if (error) throw error;
+            res.status(201).send("User Created Sucessfully");
+          }
+        );
+      }
+    });
+  } catch (error) {
+    console.error("Error:", error);
+    res.status(500).send("An error occurred while adding the user.");
+  }
+};
+
+const deleteUser = (req, res) => {
+  const { email } = req.body;
+
+  pool.query(queries.checkUserExists, [email], (error, results) => {
+    if (results.rows.length) {
+      pool.query(queries.deleteUser, [email], (error, results) => {
+        if (error) throw error;
+        res.status(201).send("User Deleted Sucessfully");
+      });
+    } else {
+      res.send("User dosen't exists.");
     }
   });
 };
@@ -124,6 +222,9 @@ const getData = (req, res) => {
 
 module.exports = {
   addDistrict,
+  deleteDistrict,
+  addUser,
+  deleteUser,
   addData,
   getData,
   auth,
