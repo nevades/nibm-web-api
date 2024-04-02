@@ -35,6 +35,6 @@ router.post(
   controller.addData
 );
 
-router.get("/", [controller.auther, controller.viewer], controller.getData);
+router.get("/", controller.getData);
 
 module.exports = router;

@@ -1,15 +1,13 @@
 var simplemaps_countrymap_mapdata = {
   main_settings: {
     //General settings
-    width: "responsive", //'700' or 'responsive'
+    width: "300", //'700' or 'responsive'
     background_color: "#FFFFFF",
     background_transparent: "yes",
     border_color: "#ffffff",
-
-    //State defaults
-    state_description: "State description",
-    state_color: "#88A4BC",
-    state_hover_color: "#3B729F",
+    state_description: "",
+    state_color: "#4f8eba",
+    state_hover_color: "#151f28",
     state_url: "",
     border_size: 1.5,
     all_states_inactive: "no",
@@ -31,12 +29,10 @@ var simplemaps_countrymap_mapdata = {
     all_locations_hidden: "no",
 
     //Label defaults
-    label_color: "#ffffff",
-    label_hover_color: "#ffffff",
-    label_size: 16,
+    label_color: "#d5ddec",
+    label_hover_color: "#d5ddec",
+    label_size: 22,
     label_font: "Arial",
-    label_display: "auto",
-    label_scale: "yes",
     hide_labels: "no",
     hide_eastern_labels: "no",
 
@@ -74,185 +70,84 @@ var simplemaps_countrymap_mapdata = {
     location_image_url: "",
   },
   state_specific: {
-    LK11: {
-      name: "Kŏḷamba",
-    },
-    LK12: {
-      name: "Gampaha",
-    },
-    LK13: {
-      name: "Kaḷutara",
-    },
-    LK21: {
+    LKA2448: {
       name: "Mahanuvara",
     },
-    LK22: {
-      name: "Mātale",
+    LKA2449: {
+      name: "Matale",
     },
-    LK23: {
-      name: "Nuvara Ĕliya",
+    LKA2450: {
+      name: "Nuwara Eliya",
     },
-    LK31: {
-      name: "Gālla",
+    LKA2451: {
+      name: "Ampara",
     },
-    LK32: {
-      name: "Mātara",
+    LKA2452: {
+      name: "Madakalapuva",
     },
-    LK33: {
-      name: "Hambantŏṭa",
+    LKA2453: {
+      name: "Polonnaruva",
     },
-    LK41: {
-      name: "Yāpanaya",
+    LKA2454: {
+      name: "Trikunamalaya",
     },
-    LK42: {
-      name: "Kilinŏchchi",
+    LKA2455: {
+      name: "Anuradhapura",
     },
-    LK43: {
-      name: "Mannārama",
+    LKA2456: {
+      name: "Vavuniyava",
     },
-    LK44: {
-      name: "Vavuniyāva",
+    LKA2457: {
+      name: "Mannarama",
     },
-    LK45: {
+    LKA2458: {
       name: "Mulativ",
     },
-    LK51: {
-      name: "Maḍakalapuva",
+    LKA2459: {
+      name: "Yapanaya",
     },
-    LK52: {
-      name: "Ampāra",
+    LKA2460: {
+      name: "Kilinochchi",
     },
-    LK53: {
-      name: "Trikuṇāmalaya",
+    LKA2461: {
+      name: "Kurunegala",
     },
-    LK61: {
-      name: "Kuruṇægala",
-    },
-    LK62: {
+    LKA2462: {
       name: "Puttalama",
     },
-    LK71: {
-      name: "Anurādhapura",
-    },
-    LK72: {
-      name: "Pŏḷŏnnaruva",
-    },
-    LK81: {
-      name: "Badulla",
-    },
-    LK82: {
-      name: "Mŏṇarāgala",
-    },
-    LK91: {
+    LKA2463: {
       name: "Ratnapura",
     },
-    LK92: {
-      name: "Kægalla",
+    LKA2464: {
+      name: "Galle",
+    },
+    LKA2465: {
+      name: "Hambantota",
+    },
+    LKA2466: {
+      name: "Matara",
+    },
+    LKA2467: {
+      name: "Badulla",
+    },
+    LKA2468: {
+      name: "Monaragala",
+    },
+    LKA2469: {
+      name: "Kegalla",
+    },
+    LKA2470: {
+      name: "Colombo",
+    },
+    LKA2471: {
+      name: "Gampaha",
+    },
+    LKA2472: {
+      name: "Kalutara",
     },
   },
   locations: {},
-  labels: {
-    LK11: {
-      name: "Kŏḷamba",
-      parent_id: "LK11",
-    },
-    LK12: {
-      name: "Gampaha",
-      parent_id: "LK12",
-    },
-    LK13: {
-      name: "Kaḷutara",
-      parent_id: "LK13",
-    },
-    LK21: {
-      name: "Mahanuvara",
-      parent_id: "LK21",
-    },
-    LK22: {
-      name: "Mātale",
-      parent_id: "LK22",
-    },
-    LK23: {
-      name: "Nuvara Ĕliya",
-      parent_id: "LK23",
-    },
-    LK31: {
-      name: "Gālla",
-      parent_id: "LK31",
-    },
-    LK32: {
-      name: "Mātara",
-      parent_id: "LK32",
-    },
-    LK33: {
-      name: "Hambantŏṭa",
-      parent_id: "LK33",
-    },
-    LK41: {
-      name: "Yāpanaya",
-      parent_id: "LK41",
-    },
-    LK42: {
-      name: "Kilinŏchchi",
-      parent_id: "LK42",
-    },
-    LK43: {
-      name: "Mannārama",
-      parent_id: "LK43",
-    },
-    LK44: {
-      name: "Vavuniyāva",
-      parent_id: "LK44",
-    },
-    LK45: {
-      name: "Mulativ",
-      parent_id: "LK45",
-    },
-    LK51: {
-      name: "Maḍakalapuva",
-      parent_id: "LK51",
-    },
-    LK52: {
-      name: "Ampāra",
-      parent_id: "LK52",
-    },
-    LK53: {
-      name: "Trikuṇāmalaya",
-      parent_id: "LK53",
-    },
-    LK61: {
-      name: "Kuruṇægala",
-      parent_id: "LK61",
-    },
-    LK62: {
-      name: "Puttalama",
-      parent_id: "LK62",
-    },
-    LK71: {
-      name: "Anurādhapura",
-      parent_id: "LK71",
-    },
-    LK72: {
-      name: "Pŏḷŏnnaruva",
-      parent_id: "LK72",
-    },
-    LK81: {
-      name: "Badulla",
-      parent_id: "LK81",
-    },
-    LK82: {
-      name: "Mŏṇarāgala",
-      parent_id: "LK82",
-    },
-    LK91: {
-      name: "Ratnapura",
-      parent_id: "LK91",
-    },
-    LK92: {
-      name: "Kægalla",
-      parent_id: "LK92",
-    },
-  },
+  labels: {},
   legend: {
     entries: [],
   },
