@@ -19,7 +19,7 @@ async function sendData() {
   try {
     var c = 1;
     var token =
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJlZGl0b3IiXSwiaWF0IjoxNzExNTQ0OTcwLCJleHAiOjE3MTE1NDg1NzB9.EWKDbB__r4EjZWEaM5UfNQ2HCusiJniXInosOWKhcsw";
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlcyI6WyJhZG1pbiIsImVkaXRvciIsInZpZXdlciJdLCJpYXQiOjE3MTIyODY2NTgsImV4cCI6MTcxMjI5MDI1OH0.h2LOp0lRvSi40EssPvbLMw9g7KD_pL_bJMUqZDi4HW8";
 
     do {
       const data = generateData(c);

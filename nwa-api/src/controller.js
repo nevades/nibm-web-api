@@ -5,52 +5,48 @@ const jwt = require("jsonwebtoken");
 
 const auther = (req, res, next) => {
   const token = req.header("x-auth-token");
-  if (!token)
+  if (!token) {
     return res.status(401).send({
-      ok: false,
+      success: false,
       error: "Access denied. No token provided",
     });
-
+  }
   try {
     const decoded = jwt.verify(token, "jwtPrivateKey");
     req.user = decoded;
   } catch (error) {
     return res.status(401).send({
-      ok: false,
+      success: false,
       error: "Token expired",
     });
   }
-
   next();
 };
 
 function admin(req, res, next) {
   if (!req.user.roles.includes("admin"))
     return res.status(403).send({
-      ok: false,
+      success: false,
       error: "Access denied.",
     });
-
   next();
 }
 
 function editor(req, res, next) {
   if (!req.user.roles.includes("editor"))
     return res.status(403).send({
-      ok: false,
+      success: false,
       error: "Access denied.",
     });
-
   next();
 }
 
 function viewer(req, res, next) {
   if (!req.user.roles.includes("viewer"))
     return res.status(403).send({
-      ok: false,
+      success: false,
       error: "Access denied.",
     });
-
   next();
 }
 
@@ -75,64 +71,49 @@ const auth = (req, res) => {
             "jwtPrivateKey",
             { expiresIn: "60m" }
           );
-          res.send({
-            ok: true,
+          res.status(200).send({
+            success: true,
             token: token,
           });
         } else {
-          res.status(401).send("Invalid email or password.");
+          res.status(400).send({
+            success: false,
+            error: "Invalid email or password.",
+          });
         }
       });
     } else {
-      res.status(401).send("Invalid email or password.");
+      res.status(400).send({
+        success: false,
+        error: "Invalid email or password.",
+      });
     }
   });
 };
-
-// const auth = async (req, res) => {
-//   const users = [
-//     {
-//       email: "nevanjith@gmail.com",
-//       password: "$2b$15$JjVln1Ut8NrfM7RiSquaIu25MmEd2jtuMWWN6Fy4Y7zFjeJhEOkXS",
-//       roles: ["admin", "editor", "viewer"],
-//     },
-//   ];
-//   // Get to user from the database, if the user is not there return error
-//   let user = users.find((u) => u.email === req.body.email);
-//   // if (!user) throw new Error("Invalid email or password.");
-//   if (!user) res.send("Invalid email or password.");
-//   // Compare the password with the password in the database
-//   const valid = await bcrypt.compare(req.body.password, user.password);
-//   // if (!valid) throw new Error("Invalid email or password.");
-//   if (!valid) res.send("Invalid email or password.");
-//   const token = jwt.sign(
-//     {
-//       id: user._id,
-//       roles: user.roles,
-//     },
-//     "jwtPrivateKey",
-//     { expiresIn: "60m" }
-//   );
-//   res.send({
-//     ok: true,
-//     token: token,
-//   });
-// };
 
 const addDistrict = (req, res) => {
   const { district_name } = req.body;
 
   if (!district_name || district_name.trim() === "") {
-    return res.status(400).send("District name is required.");
+    return res.status(400).send({
+      success: false,
+      error: "District name is required.",
+    });
   }
 
   pool.query(queries.checkDistrictExists, [district_name], (error, results) => {
     if (results.rows.length) {
-      res.send("District already exists.");
+      res.status(400).send({
+        success: false,
+        error: "District already exists.",
+      });
     } else {
       pool.query(queries.addDistrict, [district_name], (error, results) => {
         if (error) throw error;
-        res.status(201).send("District Created Sucessfully");
+        res.status(200).send({
+          success: true,
+          error: "District Created Sucessfully.",
+        });
       });
     }
   });
@@ -142,17 +123,26 @@ const deleteDistrict = (req, res) => {
   const { district_name } = req.body;
 
   if (!district_name || district_name.trim() === "") {
-    return res.status(400).send("District name is required.");
+    return res.status(400).send({
+      success: false,
+      error: "District name is required.",
+    });
   }
 
   pool.query(queries.checkDistrictExists, [district_name], (error, results) => {
     if (results.rows.length) {
       pool.query(queries.deleteDistrict, [district_name], (error, results) => {
         if (error) throw error;
-        res.status(201).send("District Deleted Sucessfully");
+        res.status(200).send({
+          success: true,
+          error: "District Deleted Sucessfully.",
+        });
       });
     } else {
-      res.send("District dosen't exists.");
+      res.status(400).send({
+        success: false,
+        error: "District dosen't exists.",
+      });
     }
   });
 };
@@ -160,28 +150,34 @@ const deleteDistrict = (req, res) => {
 const addUser = async (req, res) => {
   const { email, password, roles } = req.body;
   if (!email || !password || !roles || !email.trim() || !password.trim()) {
-    return res.status(400).send("Email, password, and role are required.");
+    return res.status(400).send({
+      success: false,
+      error: "Email, password, and role are required.",
+    });
   }
 
   try {
     const pwd_hash = await bcrypt.hash(password, 15);
-    pool.query(queries.checkUserExists, [email], (error, results) => {
-      if (results.rows.length) {
-        res.send("User already exists.");
-      } else {
-        pool.query(
-          queries.addUser,
-          [email, pwd_hash, JSON.stringify(roles)],
-          (error, results) => {
-            if (error) throw error;
-            res.status(201).send("User Created Sucessfully");
-          }
-        );
-      }
+    const results = await pool.query(queries.checkUserExists, [email]);
+
+    if (results.rows.length) {
+      return res.status(400).send({
+        success: false,
+        error: "User already exists.",
+      });
+    }
+
+    await pool.query(queries.addUser, [email, pwd_hash, JSON.stringify(roles)]);
+    res.status(200).send({
+      success: true,
+      message: "User Created Successfully",
     });
   } catch (error) {
     console.error("Error:", error);
-    res.status(500).send("An error occurred while adding the user.");
+    res.status(400).send({
+      success: false,
+      error: "An error occurred while adding the user.",
+    });
   }
 };
 
@@ -192,10 +188,16 @@ const deleteUser = (req, res) => {
     if (results.rows.length) {
       pool.query(queries.deleteUser, [email], (error, results) => {
         if (error) throw error;
-        res.status(201).send("User Deleted Sucessfully");
+        res.status(200).send({
+          success: true,
+          error: "User Deleted Sucessfully.",
+        });
       });
     } else {
-      res.send("User dosen't exists.");
+      res.status(400).send({
+        success: false,
+        error: "User dosen't exists.",
+      });
     }
   });
 };
@@ -208,13 +210,42 @@ const addData = (req, res) => {
     [district_id, temperature, humidity, air_pressure, time],
     (error, results) => {
       if (error) throw error;
-      res.status(201).send("Data entered Sucessfully");
+      res.status(200).send("Data entered Sucessfully");
     }
   );
 };
 
 const getData = (req, res) => {
   pool.query(queries.getData, (error, results) => {
+    if (error) throw error;
+    res.status(200).json(results.rows);
+  });
+};
+
+const getSpecificData = (req, res) => {
+  const { district_id } = req.body;
+
+  pool.query(queries.getSpecificData, [district_id], (error, results) => {
+    if (error) throw error;
+    res.status(200).json(results.rows);
+  });
+};
+
+const getHistoricalData = (req, res) => {
+  const { district_id, time } = req.body;
+
+  pool.query(
+    queries.getHistoricalData,
+    [district_id, time],
+    (error, results) => {
+      if (error) throw error;
+      res.status(200).json(results.rows);
+    }
+  );
+};
+
+const getDistrict = (req, res) => {
+  pool.query(queries.getDistrict, (error, results) => {
     if (error) throw error;
     res.status(200).json(results.rows);
   });
@@ -232,4 +263,7 @@ module.exports = {
   admin,
   editor,
   viewer,
+  getDistrict,
+  getSpecificData,
+  getHistoricalData,
 };

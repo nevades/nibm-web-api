@@ -1,25 +1,772 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sri Lankan Weather Map</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/slim-select@latest/dist/slimselect.css"
+    />
     <style>
-      /* body,
-      html {
+      .form-label {
+        color: #333;
+      }
+
+      .form-control {
+        border: 1px solid #9aa0a7;
+      }
+      body {
+        /* background-color: slategrey; */
         margin: 0;
         padding: 0;
-        width: 100%;
-        height: 100%;
-        overflow: hidden;
+        background-image: url("background.jpg");
+        background-size: cover;
+        background-repeat: no-repeat;
       }
+
+      .navbar {
+        background-color: #343a40;
+      }
+
+      .navbar-brand {
+        color: #fff;
+        font-weight: bold;
+      }
+
+      .navbar-nav .nav-link {
+        color: #fff;
+      }
+
       #map {
-        width: 40%;
-        height: 40%;
-      } */
+        margin-top: 25px;
+        margin-left: 25px;
+      }
+
+      #selectElement {
+        width: 100%;
+      }
     </style>
   </head>
   <body>
-    <h1>Sri Lankan Weather Map</h1>
-    <div id="map"></div>
+    <nav
+      class="navbar bg-dark navbar-expand-lg bg-body-tertiary"
+      data-bs-theme="dark"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">Sri Lankan Weather Map</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link active" aria-current="page" href="/">Home</a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href=""
+                data-bs-toggle="modal"
+                data-bs-target="#adminModal"
+                >Admin Panel</a
+              >
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href=""
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Links
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://github.com/nevades"
+                    target="_blank"
+                    >Github</a
+                  >
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="https://www.youtube.com/@nevades2003"
+                    >YouTube</a
+                  >
+                </li>
+                <li><hr class="dropdown-divider" /></li>
+                <li>
+                  <a class="dropdown-item" href=""
+                    >Made with <span style="color: #e25555">&hearts;</span> By
+                    Neva</a
+                  >
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div
+      class="modal fade"
+      id="adminModal"
+      tabindex="-1"
+      aria-labelledby="adminModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h2 class="modal-title" id="adminModalLabel">Admin Panel</h2>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p>
+              Welcome to the admin panel. You can add, edit, or delete data
+              here.
+            </p>
+            <form id="adminForm">
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <label class="form-label">Email address</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="email"
+                    placeholder="Email Address"
+                  />
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Password</label>
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="password"
+                    placeholder="Password"
+                  />
+                </div>
+              </div>
+              <div class="row mb-3">
+                <div class="col-md-6">
+                  <button
+                    type="submit"
+                    class="btn btn-primary"
+                    id="generateTokenBtn"
+                  >
+                    Generate Token
+                  </button>
+                  <div class="form-text">
+                    A token will be generated and will be valid for 60 minutes.
+                  </div>
+                </div>
+                <div class="col-md-6">
+                  <label for="x_auth_token" class="form-label"
+                    >X-Auth-Token</label
+                  >
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="x_auth_token"
+                    readonly
+                  />
+                </div>
+              </div>
+              <hr />
+              <div class="row mb-3">
+                <div class="col-md-12">
+                  <h3>District</h3>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Add District</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="addD"
+                    placeholder="District Name"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-success custom-btn"
+                    style="margin-top: 15px"
+                    id="addDbtn"
+                  >
+                    Confirm
+                  </button>
+                </div>
+                <div class="col-md-6" style="margin-bottom: 15px">
+                  <label class="form-label">Remove District</label>
+                  <input
+                    type="text"
+                    class="form-control"
+                    id="delD"
+                    placeholder="District Name"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-danger custom-btn"
+                    style="margin-top: 15px"
+                    id="delDbtn"
+                  >
+                    Confirm
+                  </button>
+                </div>
+                <hr />
+                <div class="col-md-12">
+                  <h3>User Management</h3>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label">Add User</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="addU"
+                    placeholder="Email"
+                  />
+                  <input
+                    type="password"
+                    class="form-control"
+                    id="addP"
+                    style="margin-top: 15px"
+                    placeholder="Password"
+                  />
+                  <div
+                    class="d-flex align-items-center"
+                    style="margin-top: 15px"
+                  >
+                    <button
+                      type="button"
+                      class="btn btn-success custom-btn"
+                      id="addUbtn"
+                    >
+                      Confirm
+                    </button>
+                    <div class="form-check form-check-inline ms-3">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="flexCheckboxDefault"
+                        id="flexCheckboxDefault1"
+                        checked
+                      />
+                      <label class="form-check-label" for="flexCheckboxDefault1"
+                        >Admin</label
+                      >
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="flexCheckboxDefault"
+                        id="flexCheckboxDefault2"
+                        checked
+                      />
+                      <label class="form-check-label" for="flexCheckboxDefault2"
+                        >Editor</label
+                      >
+                    </div>
+                    <div class="form-check form-check-inline">
+                      <input
+                        class="form-check-input"
+                        type="checkbox"
+                        name="flexCheckboxDefault"
+                        id="flexCheckboxDefault3"
+                        checked
+                      />
+                      <label class="form-check-label" for="flexCheckboxDefault3"
+                        >Viewer</label
+                      >
+                    </div>
+                  </div>
+                </div>
+
+                <div class="col-md-6">
+                  <label class="form-label">Remove User</label>
+                  <input
+                    type="email"
+                    class="form-control"
+                    id="delU"
+                    placeholder="Email"
+                  />
+                  <button
+                    type="button"
+                    class="btn btn-danger custom-btn"
+                    style="margin-top: 15px"
+                    id="delUbtn"
+                  >
+                    Confirm
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="container mt-3">
+      <div class="card" style="padding: 25px">
+        <div class="row">
+          <div class="col-lg-6 col-md-6 col-sm-12">
+            <div id="map"></div>
+          </div>
+          <div class="col-lg-6 col-md-6 col-sm-12 mt-3">
+            <select id="selectElement" class="form-select mb-3">
+              <option data-placeholder="true"></option>
+            </select>
+            <div class="input-group">
+              <span class="input-group-text" style="width: 160px"
+                >Temperature</span
+              >
+              <input id="temp" type="text" class="form-control" disabled />
+            </div>
+            <div class="input-group mt-3">
+              <span class="input-group-text" style="width: 160px"
+                >Humidity</span
+              >
+              <input id="hum" type="text" class="form-control" disabled />
+            </div>
+            <div class="input-group mt-3">
+              <span class="input-group-text" style="width: 160px"
+                >Air Pressure</span
+              >
+              <input id="air" type="text" class="form-control" disabled />
+            </div>
+            <div class="input-group mt-3">
+              <span class="input-group-text" style="width: 160px"
+                >Data Last Updated</span
+              >
+              <input id="time" type="text" class="form-control" disabled />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container" style="margin-top: 15px">
+      <div class="card">
+        <div class="card-body">
+          <h5 class="card-title">View Historical Data Records</h5>
+          <p class="card-text">
+            Our data is updated every 5 minutes, the data returned will be the
+            closest to your entered date/time.
+          </p>
+          <div class="row align-items-center">
+            <div class="col-md-4 mb-3">
+              <label class="form-label" style="width: 170px"
+                >Select Time:</label
+              >
+              <select id="selectElement2" class="form-select">
+                <option data-placeholder="true"></option>
+              </select>
+            </div>
+            <div class="col-md-4 mb-3">
+              <label for="datetimeInput" class="form-label" style="width: 170px"
+                >Enter Date/Time:</label
+              >
+              <input
+                type="datetime-local"
+                class="form-control"
+                id="datetimeInput"
+              />
+            </div>
+            <div class="col-md-4">
+              <label class="invisible" style="width: 170px">View Button</label>
+              <button class="btn btn-primary w-100" id="viewH">View</button>
+            </div>
+          </div>
+          <div class="row mt-4">
+            <div class="col-md-6">
+              <div class="input-group mb-3">
+                <span class="input-group-text" style="width: 170px"
+                  >Temperature</span
+                >
+                <input id="tempH" type="text" class="form-control" disabled />
+              </div>
+              <div class="input-group mb-3">
+                <span class="input-group-text" style="width: 170px"
+                  >Humidity</span
+                >
+                <input id="humH" type="text" class="form-control" disabled />
+              </div>
+            </div>
+            <div class="col-md-6">
+              <div class="input-group mb-3">
+                <span class="input-group-text" style="width: 170px"
+                  >Air Pressure</span
+                >
+                <input id="airH" type="text" class="form-control" disabled />
+              </div>
+              <div class="input-group mb-3">
+                <span class="input-group-text" style="width: 170px"
+                  >Data Last Updated</span
+                >
+                <input id="timeH" type="text" class="form-control" disabled />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/slim-select@latest/dist/slimselect.min.js"></script>
+    <script
+      src="https://code.jquery.com/jquery-3.7.1.slim.min.js"
+      integrity="sha256-kmHvs0B+OpCW5GVHUNjv9rOmY0IvSIRcf7zGUDTDQM8="
+      crossorigin="anonymous"
+    ></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="./mapdata.js"></script>
     <script src="./countrymap.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", async function () {
+        const selectElement = document.getElementById("selectElement");
+        const selectElement2 = document.getElementById("selectElement2");
+        const generateTokenBtn = document.getElementById("generateTokenBtn");
+        const xAuthTokenInput = document.getElementById("x_auth_token");
+        const addUbtn = document.getElementById("addUbtn");
+
+        const temp = $("#temp");
+        const hum = $("#hum");
+        const air = $("#air");
+        const time = $("#time");
+
+        const tempH = $("#tempH");
+        const humH = $("#humH");
+        const airH = $("#airH");
+        const timeH = $("#timeH");
+
+        selectElement2.addEventListener("change", function () {
+          selectedOptionId2 = this.options[this.selectedIndex].id;
+        });
+
+        async function fetchData(url, options) {
+          try {
+            const response = await fetch(url, options);
+            const data = await response.json();
+            console.log("Response:", data);
+            if (data.success || data.success == false) {
+              const iconS = data.success ? "success" : "error";
+              const titleS = data.success ? "Success" : "Error";
+              Swal.fire({
+                icon: iconS,
+                title: titleS,
+                text: data.error,
+              });
+              document.getElementById("addD").value = "";
+              document.getElementById("delD").value = "";
+              document.getElementById("addU").value = "";
+              document.getElementById("addP").value = "";
+              document.getElementById("delU").value = "";
+            }
+            if (!response.ok) {
+              throw new Error("Network response was not ok");
+            }
+            return data;
+          } catch (error) {
+            console.error("Error:", error);
+            throw error;
+          }
+        }
+
+        async function handleDistrictData(elementId) {
+          const url = "/api/weather/district/get";
+          try {
+            const data = await fetchData(url);
+            data.forEach((district) => {
+              const option = document.createElement("option");
+              option.value = district.district_name;
+              option.textContent = district.district_name;
+              option.setAttribute("id", district.district_id);
+              document.getElementById(elementId).appendChild(option);
+            });
+            new SlimSelect({
+              select: `#${elementId}`,
+              settings: {
+                placeholderText: "Select District",
+              },
+            });
+          } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Unable to fetch district data. Please try again later.",
+            });
+          }
+        }
+
+        async function generateAuthToken(email, password) {
+          const url = "/api/weather/auth";
+          const options = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              email: email,
+              password: password,
+            }),
+          };
+          try {
+            const data = await fetchData(url, options);
+            xAuthTokenInput.value = data.token;
+            Swal.fire({
+              icon: "success",
+              title: "Success",
+              text: "Token generated [Timeout in 60 Minutes]",
+            });
+            document.getElementById("email").value = "";
+            document.getElementById("password").value = "";
+          } catch (error) {
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Unable to generate token. Please check email and password.",
+            });
+            console.error("Error:", error);
+          }
+        }
+
+        generateTokenBtn.addEventListener("click", function (event) {
+          event.preventDefault();
+          const email = document.getElementById("email").value;
+          const password = document.getElementById("password").value;
+          generateAuthToken(email, password);
+        });
+
+        handleDistrictData("selectElement");
+        handleDistrictData("selectElement2");
+
+        $("#selectElement").change(async function () {
+          var selectedOptionId = $(this).children("option:selected").attr("id");
+
+          const url = "/api/weather/specific";
+          const options = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              district_id: selectedOptionId,
+            }),
+          };
+
+          try {
+            const data = await fetchData(url, options);
+            if (data.length > 0) {
+              const weatherData = data[0];
+              temp.val(weatherData.temperature);
+              hum.val(weatherData.humidity);
+              air.val(weatherData.air_pressure);
+              const dateTime = new Date(weatherData.time);
+              const formattedTime = `${dateTime.toLocaleDateString()} ${dateTime.toLocaleTimeString()}`;
+              time.val(formattedTime);
+            } else {
+              console.error("Error: Empty data received");
+              temp.val("");
+              hum.val("");
+              air.val("");
+              time.val("");
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Empty data received. Please try again later.",
+              });
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Unable to fetch weather data. Please try again later.",
+            });
+          }
+        });
+
+        viewH.addEventListener("click", async function (event) {
+          const datetimeInput = document.getElementById("datetimeInput").value;
+
+          const formattedDatetime = new Date(datetimeInput)
+            .toISOString()
+            .slice(0, 19)
+            .replace("T", " ");
+          const selectedOptionId2Update = selectedOptionId2;
+          const url = "/api/weather/historical";
+          const options = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              district_id: parseInt(selectedOptionId2Update),
+              time: formattedDatetime,
+            }),
+          };
+
+          try {
+            const dataH = await fetchData(url, options);
+            if (dataH.length > 0) {
+              const weatherDataH = dataH[0];
+              tempH.val(weatherDataH.temperature);
+              humH.val(weatherDataH.humidity);
+              airH.val(weatherDataH.air_pressure);
+              const dateTimeH = new Date(weatherDataH.time);
+              const formattedTimeH = `${dateTimeH.toLocaleDateString()} ${dateTimeH.toLocaleTimeString()}`;
+              timeH.val(formattedTimeH);
+            } else {
+              tempH.val("");
+              humH.val("");
+              airH.val("");
+              timeH.val("");
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Empty data received. Please try again later.",
+              });
+            }
+          } catch (error) {
+            console.error("Error:", error);
+            Swal.fire({
+              icon: "error",
+              title: "Error",
+              text: "Unable to fetch weather data. Please try again later.",
+            });
+          }
+        });
+
+        delDbtn.addEventListener("click", async function (event) {
+          const delD = document.getElementById("delD").value;
+          const url = "/api/weather/district/delete";
+          const options = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-auth-token": xAuthTokenInput.value,
+            },
+            body: JSON.stringify({
+              district_name: delD,
+            }),
+          };
+
+          try {
+            const data = await fetchData(url, options);
+          } catch (error) {}
+        });
+
+        addDbtn.addEventListener("click", async function (event) {
+          const addD = document.getElementById("addD").value;
+
+          const url = "/api/weather/district/add";
+          const options = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-auth-token": xAuthTokenInput.value,
+            },
+            body: JSON.stringify({
+              district_name: addD,
+            }),
+          };
+
+          try {
+            const data = await fetchData(url, options);
+          } catch (error) {}
+        });
+
+        delUbtn.addEventListener("click", async function (event) {
+          const delU = document.getElementById("delU").value;
+          const url = "/api/weather/user/delete";
+          const options = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-auth-token": xAuthTokenInput.value,
+            },
+            body: JSON.stringify({
+              email: delU,
+            }),
+          };
+
+          try {
+            const data = await fetchData(url, options);
+          } catch (error) {}
+        });
+
+        addUbtn.addEventListener("click", async function (event) {
+          const addU = document.getElementById("addU").value;
+          const addP = document.getElementById("addP").value;
+
+          const checkbox1 = document.getElementById("flexCheckboxDefault1");
+          const checkbox2 = document.getElementById("flexCheckboxDefault2");
+          const checkbox3 = document.getElementById("flexCheckboxDefault3");
+
+          const roles = [];
+          if (checkbox1.checked) {
+            roles.push(
+              checkbox1.nextElementSibling.textContent.trim().toLowerCase()
+            );
+          }
+          if (checkbox2.checked) {
+            roles.push(
+              checkbox2.nextElementSibling.textContent.trim().toLowerCase()
+            );
+          }
+          if (checkbox3.checked) {
+            roles.push(
+              checkbox3.nextElementSibling.textContent.trim().toLowerCase()
+            );
+          }
+
+          const url = "/api/weather/user/add";
+          const options = {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-auth-token": xAuthTokenInput.value,
+            },
+            body: JSON.stringify({
+              email: addU,
+              password: addP,
+              roles: roles,
+            }),
+          };
+
+          try {
+            const data = await fetchData(url, options);
+          } catch (error) {}
+        });
+      });
+    </script>
   </body>
 </html>

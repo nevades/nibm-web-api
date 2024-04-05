@@ -37,4 +37,10 @@ router.post(
 
 router.get("/", controller.getData);
 
+router.post("/specific", controller.getSpecificData);
+
+router.post("/historical", controller.getHistoricalData);
+
+router.get("/district/get", controller.getDistrict);
+
 module.exports = router;
